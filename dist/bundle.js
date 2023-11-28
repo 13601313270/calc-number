@@ -37,7 +37,9 @@
     constructor(type, data) {
       this.type = type;
       this.data = data.map(v => {
-        if (v instanceof Array) {
+        if (v instanceof runObj) {
+          return v.run();
+        } else if (v instanceof Array) {
           let runObjItem = new runObj(v[1], [v[0], v[2]]);
           return runObjItem.run();
         } else {
@@ -81,11 +83,7 @@
   //   new runObj('+', [12, 22])
   // ), 2])
 
-  function numberCalc(runStr) {
-    // 第一步分词
-    let resultArr = split(runStr);// '1+2'    =>   ['1', '+', '2']
-    // 第二步
-    // ['1', '+', '2'] => { runType: '+', data: [{runType: 'number', data: 1},'2']}
+  function arrayToRunObjType(resultArr) {
     let temp = [[]];
     // 1 + 1 * 2 - 3 * 2
     // [1 ,+ ,1, * ,2, - ,3, * ,2]
@@ -93,12 +91,22 @@
     for (let i = 0; i < resultArr.length; i++) {
       if (resultArr[i].match(/\d+/)) {
         temp[temp.length - 1].push(resultArr[i]);
-        // if (temp[temp.length - 1].length === 1) {
-        //   // 1+2*3/2+2*4
-        //   // 1+(2*3/2)+(2*4)
-        //   temp[temp.length - 1] = parseFloat(temp[temp.length - 1][0])
-        // }
-      } else if (['*', '/'].includes(resultArr[i])) {
+      } else if (resultArr[i] === '(') {
+        const chileRunList = [];
+
+        for (let j = i + 1; j < resultArr.length; j++) {
+          if (resultArr[j] === ')') {
+            break;
+          }
+          chileRunList.push(resultArr[j]);
+        }
+        const result = arrayToRunObjType(chileRunList);
+        console.log('===================');
+        console.log(chileRunList);
+        temp[temp.length - 1].push(result);
+        i += chileRunList.length + 1;
+      }
+      else if (['*', '/'].includes(resultArr[i])) {
         if (temp[temp.length - 1].length === 1) {
           temp[temp.length - 1].push(resultArr[i]);
         } else {
@@ -115,6 +123,8 @@
         }
         temp[temp.length - 1] = resultArr[i];
         temp.push([]);
+      } else {
+        throw new Error('分词失败' + resultArr[i])
       }
     }
     if (temp[temp.length - 1].length === 1) {
@@ -125,6 +135,7 @@
     if (temp.length === 1) {
       temp = temp[0];
     }
+    console.log('=============temp=============');
     console.log(temp);
     let runObjItem;
     if (['+', '-', '*', '/'].includes(temp[1])) {
@@ -132,6 +143,15 @@
     } else {
       throw new Error('结构不存在' + temp[1])
     }
+    return runObjItem;
+  }
+
+  function numberCalc(runStr) {
+    // 第一步分词
+    let resultArr = split(runStr);// '1+2'    =>   ['1', '+', '2']
+    // 第二步
+    // ['1', '+', '2'] => { runType: '+', data: [{runType: 'number', data: 1},'2']}
+    let runObjItem = arrayToRunObjType(resultArr);
     return runObjItem.run()
   }
 
@@ -148,7 +168,10 @@
     ['0.1+0.2+0.3', ['0.1', '+', '0.2', '+', '0.3'], 0.6],
     ['1+2', ['1', '+', '2'], 3],
     ['134+2', ['134', '+', '2'], 136],
-    // ['(12+22)*2', ['(', '12', '+', '22', ')', '*', '2'], 68],
+    ['(12+22)*2', ['(', '12', '+', '22', ')', '*', '2'], 68],
+    ['1+(12+22)*2', ['1', '+', '(', '12', '+', '22', ')', '*', '2'], 69],
+    ['1+(12+22)*2+1', ['1', '+', '(', '12', '+', '22', ')', '*', '2'], 70],
+    // ['1+(12+22)*2+(1+1)', ['1', '+', '(', '12', '+', '22', ')', '*', '2'], 71],
     // ['3**2', ['3', '**', '2'], 9],
     // // ['2*3**2', ['2', '*', '3', '**', '2'], 18],
     // ['sin(1+1)', ['sin', '(', '1', '+', '1', ')'], Math.sin(2)],
