@@ -1,6 +1,6 @@
 {
   "name": "calc-number",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -10,8 +10,5 @@
   "license": "ISC",
   "dependencies": {
     "bignumber.js": "^9.1.2"
-  },
-  "devDependencies": {
-    "rollup": "^4.6.0"
   }
 }
