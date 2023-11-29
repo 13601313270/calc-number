@@ -1,6 +1,6 @@
 {
-  "name": "numberCalc",
-  "version": "0.1",
+  "name": "calc-number",
+  "version": "0.0.1",
   "description": "",
   "main": "src/index.js",
   "scripts": {
