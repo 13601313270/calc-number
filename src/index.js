@@ -59,11 +59,13 @@ class runObj {
 //   new runObj('+', [12, 22])
 // ), 2])
 
+const allKeyWord = [
+  ['**'],
+  ['*', '/'],
+  ['+', '-'],
+];// 以优先级排列
 function arrayToRunObjType(resultArr, endKeyWord = []) {
   let temp = [[]];
-  // 1 + 1 * 2 - 3 * 2
-  // [1 ,+ ,1, * ,2, - ,3, * ,2]
-  // [[1] , [+] ,[1, * ,2], [-] ,[3, * ,2]]
   for (let i = 0; i < resultArr.length; i++) {
     if (endKeyWord.includes(resultArr[i])) {
       break;
@@ -82,44 +84,34 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
       temp[temp.length - 1].push(result);
       i += childRunList.length + 1;
     } else if (['sin', 'cos'].includes(resultArr[i])) {
-      // console.log(temp)
-      // console.log(resultArr)
-      // console.log(resultArr.slice(i + 2));
       const nextObj = arrayToRunObjType(resultArr.slice(i + 2), [')'])
       temp[temp.length - 1].push(nextObj)
       temp[temp.length - 1].push(resultArr[i])
-      // console.log(nextObj);
-    } else if (resultArr[i] === '**') {
+    } else if (['**', '*', '/', '+', '-'].includes(resultArr[i])) {
       if (temp[temp.length - 1].length === 1) {
         temp[temp.length - 1].push(resultArr[i]);
       } else {
-        // temp[temp.length - 1] = [temp[temp.length - 1]]
-        // temp[temp.length - 1].push(resultArr[i]);
-        const nextObj = arrayToRunObjType(resultArr.slice(i + 1), ['+', '-', '*', '/'])
-        temp[temp.length - 1][temp[temp.length - 1].length - 1] = [
-          temp[temp.length - 1][temp[temp.length - 1].length - 1],
-          resultArr[i],
-          nextObj,
-        ]
-        // temp[temp.length - 1][temp[temp.length - 1].length - 1]
+        const preview = temp[temp.length - 1];
+        const thisIndex = allKeyWord.findIndex(v => v.includes(resultArr[i]));
+        const preIndex = allKeyWord.findIndex(v => v.includes(preview[1]))
+        const allNextKeyword = []
+        allKeyWord.slice(thisIndex + 1).forEach(v => {
+          v.forEach(vv => {
+            allNextKeyword.push(vv)
+          })
+        })
+        if (thisIndex < preIndex || (['**'].includes(resultArr[i]) && thisIndex === preIndex)) { // 本优先级更高进行优先级抢夺，**连自己也会抢夺
+          const nextObj = arrayToRunObjType(resultArr.slice(i + 1), allNextKeyword)
+          preview[preview.length - 1] = [
+            preview[preview.length - 1],
+            resultArr[i],
+            nextObj,
+          ]
+        } else {
+          temp[temp.length - 1] = [temp[temp.length - 1]]
+          temp[temp.length - 1].push(resultArr[i]);
+        }
       }
-    } else if (['*', '/'].includes(resultArr[i])) {
-      if (temp[temp.length - 1].length === 1) {
-        temp[temp.length - 1].push(resultArr[i]);
-      } else {
-        temp[temp.length - 1] = [temp[temp.length - 1]]
-        temp[temp.length - 1].push(resultArr[i]);
-      }
-    } else if (['+', '-'].includes(resultArr[i])) {
-      if (temp[temp.length - 1].length === 1) {
-        temp[temp.length - 1] = parseFloat(temp[temp.length - 1][0])
-      }
-      temp.push([])
-      if (temp.length > 2) {
-        temp = [[temp[0], temp[1], temp[2]], []]
-      }
-      temp[temp.length - 1] = resultArr[i];
-      temp.push([])
     } else {
       throw new Error('分词失败' + resultArr[i])
     }
