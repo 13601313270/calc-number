@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "big-number": "^2.0.0",
-    "bignumber.js": "^9.1.2",
+    "bignumber.js": "^9.1.2"
+  },
+  "devDependencies": {
     "rollup": "^4.6.0"
   }
 }
