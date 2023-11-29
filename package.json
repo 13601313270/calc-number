@@ -1,8 +1,8 @@
 {
-  "name": "numbercalc",
-  "version": "1.0.0",
+  "name": "numberCalc",
+  "version": "0.1",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "rollup -c && node dist/bundle.js"
   },
