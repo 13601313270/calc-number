@@ -28,8 +28,9 @@
     let resultArr = [];
     let split = 0;
     while (split < runStr.length) {
-      if (Object.keys(allMethod).includes(runStr.slice(split, split + 3))) {
-        resultArr.push(runStr.slice(split, split + 3));
+      const match = Object.keys(allMethod).find(v => v === runStr.slice(split, split + v.length));
+      if (match) {
+        resultArr.push(runStr.slice(split, split + match.length));
         split += 3;
       } else if (['**'].includes(runStr.slice(split, split + 2))) {
         resultArr.push(runStr.slice(split, split + 2));
@@ -116,7 +117,7 @@
   // ), 2])
 
   const allKeyWord = [
-    ['sin', 'cos'],
+    Object.keys(allMethod),
     ['**'],
     ['*', '/'],
     ['+', '-'],
@@ -134,35 +135,30 @@
       } else if (word === '(') {
         slip++;
         const result = arrayToRunObjType(resultArr, [')']);
-        slip--;
-        slip++;// 针对)
+        if (resultArr[slip] !== ')') {
+          throw new Error('结构错误')
+        }
         temp[temp.length - 1].push(result);
       } else if (Object.keys(allMethod).includes(word)) {
+        slip += 2;
+        const nextObj = arrayToRunObjType(resultArr, [')']);
         if (temp[temp.length - 1].length === 0) {
-          // console.log(resultArr.slice(slip + 2))
-          slip += 2;
-          const nextObj = arrayToRunObjType(resultArr, [')']);
-          // console.log(nextObj)
           temp[temp.length - 1].push(nextObj);
           temp[temp.length - 1].push(word);
         } else {
-          slip += 2;
-          temp[temp.length - 1].push([
-            arrayToRunObjType(resultArr, [')']),
-            word,
-          ]);
+          temp[temp.length - 1].push([nextObj, word]);
+        }
+        if (resultArr[slip] !== ')') {
+          throw new Error('结构错误')
         }
       } else if (['**', '*', '/', '+', '-'].includes(word)) {
         if (temp[temp.length - 1].length === 1) {
           temp[temp.length - 1].push(word);
         } else {
-          // console.log('???????????????????????')
           const preview = temp[temp.length - 1];
           const thisIndex = allKeyWord.findIndex(v => v.includes(word));
           const preIndex = allKeyWord.findIndex(v => v.includes(preview[1]));
-          // console.log(preview[1], word)
           const allNextKeyword = [];
-          // console.log(preview)
           allKeyWord.slice(thisIndex + 1).forEach(v => {
             v.forEach(vv => {
               allNextKeyword.push(vv);
@@ -251,6 +247,7 @@
     ['(12+22)*2', ['(', '12', '+', '22', ')', '*', '2'], 68],
     ['(0.3+0.3)*3', ['(', '0.3', '+', '0.3', ')', '*', '3'], 1.8],
     ['1+(12+22)*2', ['1', '+', '(', '12', '+', '22', ')', '*', '2'], 69],
+    ['1+(12+22)+1*2', ['1', '+', '(', '12', '+', '22', ')', '*', '2'], 37],
     ['1+(12+22)*2+1', ['1', '+', '(', '12', '+', '22', ')', '*', '2'], 70],
     ['1+(12+22)*2+(1+1)', ['1', '+', '(', '12', '+', '22', ')', '*', '2'], 71],
     ['3**2', ['3', '**', '2'], 9],
@@ -265,7 +262,7 @@
     ['cos(1)+1', ['cos', '(', '1', ')'], Math.cos(1) + 1],
     ['cos(1)+sin(1)', ['cos', '(', '1', ')', '+' + 'sin' + '(' + '1' + ')'], Math.cos(1) + Math.sin(1)],
     ['tan(1)', ['tan', '(', '1', ')'], Math.tan(1)],
-    // ['atan(1)', ['atan', '(', '1', ')'], Math.atan(1)],
+    ['atan(1)', ['atan', '(', '1', ')'], Math.atan(1)],
   ];
 
   for (let i = 0; i < testList.length; i++) {

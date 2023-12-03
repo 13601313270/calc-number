@@ -61,7 +61,7 @@ class runObj {
 // ), 2])
 
 const allKeyWord = [
-  ['sin', 'cos'],
+  Object.keys(allMethod),
   ['**'],
   ['*', '/'],
   ['+', '-'],
@@ -79,35 +79,30 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
     } else if (word === '(') {
       slip++;
       const result = arrayToRunObjType(resultArr, [')']);
-      slip--;
-      slip++;// 针对)
+      if (resultArr[slip] !== ')') {
+        throw new Error('结构错误')
+      }
       temp[temp.length - 1].push(result);
     } else if (Object.keys(allMethod).includes(word)) {
+      slip += 2;
+      const nextObj = arrayToRunObjType(resultArr, [')'])
       if (temp[temp.length - 1].length === 0) {
-        // console.log(resultArr.slice(slip + 2))
-        slip += 2;
-        const nextObj = arrayToRunObjType(resultArr, [')'])
-        // console.log(nextObj)
         temp[temp.length - 1].push(nextObj)
         temp[temp.length - 1].push(word)
       } else {
-        slip += 2;
-        temp[temp.length - 1].push([
-          arrayToRunObjType(resultArr, [')']),
-          word,
-        ])
+        temp[temp.length - 1].push([nextObj, word])
+      }
+      if (resultArr[slip] !== ')') {
+        throw new Error('结构错误')
       }
     } else if (['**', '*', '/', '+', '-'].includes(word)) {
       if (temp[temp.length - 1].length === 1) {
         temp[temp.length - 1].push(word);
       } else {
-        // console.log('???????????????????????')
         const preview = temp[temp.length - 1];
         const thisIndex = allKeyWord.findIndex(v => v.includes(word));
         const preIndex = allKeyWord.findIndex(v => v.includes(preview[1]))
-        // console.log(preview[1], word)
         const allNextKeyword = []
-        // console.log(preview)
         allKeyWord.slice(thisIndex + 1).forEach(v => {
           v.forEach(vv => {
             allNextKeyword.push(vv)

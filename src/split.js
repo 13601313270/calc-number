@@ -4,8 +4,9 @@ export default function (runStr) {
   let resultArr = [];
   let split = 0;
   while (split < runStr.length) {
-    if (Object.keys(allMethod).includes(runStr.slice(split, split + 3))) {
-      resultArr.push(runStr.slice(split, split + 3))
+    const match = Object.keys(allMethod).find(v => v === runStr.slice(split, split + v.length));
+    if (match) {
+      resultArr.push(runStr.slice(split, split + match.length))
       split += 3;
     } else if (['**'].includes(runStr.slice(split, split + 2))) {
       resultArr.push(runStr.slice(split, split + 2))
