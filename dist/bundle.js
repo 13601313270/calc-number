@@ -50,7 +50,8 @@
     run() {
       const BigNumber = require('bignumber.js');
       if (this.type === '+') {
-        return BigNumber.sum(this.data[0], this.data[1]).toNumber()
+        const temp = new BigNumber(this.data[0]);
+        return temp.plus(this.data[1]).toNumber()
       } else if (this.type === '-') {
         const temp = new BigNumber(this.data[0]);
         return temp.minus(this.data[1]).toNumber()
@@ -162,7 +163,6 @@
     if (temp.length === 1) {
       temp = temp[0];
     }
-    // console.log(JSON.stringify(temp));
     let runObjItem;
     if (typeof temp === 'number') {
       runObjItem = new runObj('number', [temp]);
@@ -190,9 +190,14 @@
     ['1+2*3+2*4', ['1', '+', '2', '*', '3', '+', '2', '*', '4'], 15],
     ['1+2*3+2', ['1', '+', '2', '*', '3', '+', '2'], 9],
     ['1+2*3', ['1', '+', '2', '*', '3'], 7],
+    ['2*(3+4)', ['2', '*', '(', '3', '+', '4', ')'], 14],
     ['2*3', ['2', '*', '3'], 6],
     ['2-3', ['2', '-', '3'], -1],
     ['2/3', ['2', '/', '3'], 2 / 3],
+    ['2/4', ['2', '/', '3'], 0.5],
+    ['11*0.175', [], 1.925],
+    ['39.9/100', [], 0.399],
+    ['69.51 - 15', [], 54.51],
     ['2*3*4', ['2', '*', '3', '*', '4'], 24],
     ['0.1+0.2', ['0.1', '+', '0.2'], 0.3],
     ['0.1+0.2+0.3', ['0.1', '+', '0.2', '+', '0.3'], 0.6],

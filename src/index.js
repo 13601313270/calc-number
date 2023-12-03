@@ -16,7 +16,8 @@ class runObj {
   run() {
     const BigNumber = require('bignumber.js')
     if (this.type === '+') {
-      return BigNumber.sum(this.data[0], this.data[1]).toNumber()
+      const temp = new BigNumber(this.data[0])
+      return temp.plus(this.data[1]).toNumber()
     } else if (this.type === '-') {
       const temp = new BigNumber(this.data[0])
       return temp.minus(this.data[1]).toNumber()
