@@ -66,62 +66,69 @@ const allKeyWord = [
   ['*', '/'],
   ['+', '-'],
 ];// 以优先级排列
+let slip = 0
 function arrayToRunObjType(resultArr, endKeyWord = []) {
   let temp = [[]];
-  for (let i = 0; i < resultArr.length; i++) {
-    if (endKeyWord.includes(resultArr[i])) {
+  for (; slip < resultArr.length; slip++) {
+    const word = resultArr[slip]
+    if (endKeyWord.includes(word)) {
       break;
     }
-    if (resultArr[i].match(/\d+/)) {
-      temp[temp.length - 1].push(resultArr[i]);
-    } else if (resultArr[i] === '(') {
-      const childRunList = [];
-      for (let j = i + 1; j < resultArr.length; j++) {
-        if (resultArr[j] === ')') {
-          break;
-        }
-        childRunList.push(resultArr[j])
-      }
-      const result = arrayToRunObjType(childRunList, [')']);
+    if (word.match(/\d+/)) {
+      temp[temp.length - 1].push(word);
+    } else if (word === '(') {
+      slip++;
+      const result = arrayToRunObjType(resultArr, [')']);
+      slip--;
+      slip++;// 针对)
       temp[temp.length - 1].push(result);
-      i += childRunList.length + 1;
-    } else if (Object.keys(allMethod).includes(resultArr[i])) {
-      // console.log('=================------------')
-      // console.log(resultArr[i])
-      // console.log(resultArr.slice(i + 2))
-      const nextObj = arrayToRunObjType(resultArr.slice(i + 2), [')'])
-      // console.log(nextObj)
-      temp[temp.length - 1].push(nextObj)
-      temp[temp.length - 1].push(resultArr[i])
-    } else if (['**', '*', '/', '+', '-'].includes(resultArr[i])) {
+    } else if (Object.keys(allMethod).includes(word)) {
+      if (temp[temp.length - 1].length === 0) {
+        // console.log(resultArr.slice(slip + 2))
+        slip += 2;
+        const nextObj = arrayToRunObjType(resultArr, [')'])
+        // console.log(nextObj)
+        temp[temp.length - 1].push(nextObj)
+        temp[temp.length - 1].push(word)
+      } else {
+        slip += 2;
+        temp[temp.length - 1].push([
+          arrayToRunObjType(resultArr, [')']),
+          word,
+        ])
+      }
+    } else if (['**', '*', '/', '+', '-'].includes(word)) {
       if (temp[temp.length - 1].length === 1) {
-        temp[temp.length - 1].push(resultArr[i]);
+        temp[temp.length - 1].push(word);
       } else {
         // console.log('???????????????????????')
         const preview = temp[temp.length - 1];
-        const thisIndex = allKeyWord.findIndex(v => v.includes(resultArr[i]));
+        const thisIndex = allKeyWord.findIndex(v => v.includes(word));
         const preIndex = allKeyWord.findIndex(v => v.includes(preview[1]))
+        // console.log(preview[1], word)
         const allNextKeyword = []
-        console.log(preview)
+        // console.log(preview)
         allKeyWord.slice(thisIndex + 1).forEach(v => {
           v.forEach(vv => {
             allNextKeyword.push(vv)
           })
         })
-        if (thisIndex < preIndex || (['**'].includes(resultArr[i]) && thisIndex === preIndex)) { // 本优先级更高进行优先级抢夺，**连自己也会抢夺
-          const nextObj = arrayToRunObjType(resultArr.slice(i + 1), allNextKeyword)
+        if (thisIndex < preIndex || (['**'].includes(word) && thisIndex === preIndex)) { // 本优先级更高进行优先级抢夺，**连自己也会抢夺
+          slip++;
+          const nextObj = arrayToRunObjType(resultArr, allNextKeyword)
+          slip--;
           preview[preview.length - 1] = [
             preview[preview.length - 1],
-            resultArr[i],
+            word,
             nextObj,
           ]
         } else {
           temp[temp.length - 1] = [temp[temp.length - 1]]
-          temp[temp.length - 1].push(resultArr[i]);
+          temp[temp.length - 1].push(word);
         }
       }
     } else {
-      throw new Error('分词失败' + resultArr[i])
+      throw new Error('分词失败' + word)
     }
   }
   if (temp[temp.length - 1].length === 1) {
@@ -133,6 +140,8 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
       temp[temp.length - 1] = temp[temp.length - 1][0]
     }
   }
+  // console.log('=================temp==============')
+  // console.log(JSON.stringify(temp))
   if (temp.length === 1) {
     temp = temp[0]
   }
@@ -140,6 +149,7 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
     // console.log('=================')
     // console.log(temp)
   }
+
   let runObjItem;
   if (typeof temp === 'number') {
     runObjItem = new runObj('number', [temp]);
@@ -162,6 +172,7 @@ function numberCalc(runStr) {
   // console.log(resultArr)
   // 第二步
   // ['1', '+', '2'] => { runType: '+', data: [{runType: 'number', data: 1},'2']}
+  slip = 0;
   let runObjItem = arrayToRunObjType(resultArr, [])
   // console.log(runObjItem)
   return runObjItem.run()
