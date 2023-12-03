@@ -10,5 +10,15 @@
   "license": "ISC",
   "dependencies": {
     "bignumber.js": "^9.1.2"
-  }
+  },
+  "types": "./src/index.d.ts",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/13601313270/calc-number.git"
+  },
+  "bugs": {
+    "url": "https://github.com/13601313270/calc-number/issues"
+  },
+  "homepage": "https://github.com/13601313270/calc-number#readme"
 }

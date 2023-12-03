@@ -1,4 +1,6 @@
 import split from "./split";
+import allMethod from './method/index'
+
 class runObj {
   constructor(type, data) {
     this.type = type;
@@ -32,10 +34,8 @@ class runObj {
       return temp.pow(this.data[1]).toNumber()
     } else if (this.type === 'number') {
       return this.data[0];
-    } else if (this.type === 'sin') {
-      return Math.sin(this.data[0]);
-    } else if (this.type === 'cos') {
-      return Math.cos(this.data[0]);
+    } else if (allMethod[this.type]) {
+      return allMethod[this.type](this.data);
     } else {
       console.log(this.type);
       throw new Error('运算类型不存在' + this.type)
@@ -61,6 +61,7 @@ class runObj {
 // ), 2])
 
 const allKeyWord = [
+  ['sin', 'cos'],
   ['**'],
   ['*', '/'],
   ['+', '-'],
@@ -84,18 +85,24 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
       const result = arrayToRunObjType(childRunList, [')']);
       temp[temp.length - 1].push(result);
       i += childRunList.length + 1;
-    } else if (['sin', 'cos'].includes(resultArr[i])) {
+    } else if (Object.keys(allMethod).includes(resultArr[i])) {
+      // console.log('=================------------')
+      // console.log(resultArr[i])
+      // console.log(resultArr.slice(i + 2))
       const nextObj = arrayToRunObjType(resultArr.slice(i + 2), [')'])
+      // console.log(nextObj)
       temp[temp.length - 1].push(nextObj)
       temp[temp.length - 1].push(resultArr[i])
     } else if (['**', '*', '/', '+', '-'].includes(resultArr[i])) {
       if (temp[temp.length - 1].length === 1) {
         temp[temp.length - 1].push(resultArr[i]);
       } else {
+        // console.log('???????????????????????')
         const preview = temp[temp.length - 1];
         const thisIndex = allKeyWord.findIndex(v => v.includes(resultArr[i]));
         const preIndex = allKeyWord.findIndex(v => v.includes(preview[1]))
         const allNextKeyword = []
+        console.log(preview)
         allKeyWord.slice(thisIndex + 1).forEach(v => {
           v.forEach(vv => {
             allNextKeyword.push(vv)
@@ -129,14 +136,21 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
   if (temp.length === 1) {
     temp = temp[0]
   }
+  if (typeof temp !== 'number') {
+    // console.log('=================')
+    // console.log(temp)
+  }
   let runObjItem;
   if (typeof temp === 'number') {
     runObjItem = new runObj('number', [temp]);
   } else if (['+', '-', '*', '/', '**'].includes(temp[1])) {
     runObjItem = new runObj(temp[1], [temp[0], temp[2]]);
-  } else if (['sin', 'cos'].includes(temp[1])) {
+  } else if (Object.keys(allMethod).includes(temp[1])) {
+    // console.log('=================')
+    // console.log(temp)
     runObjItem = new runObj(temp[1], [temp[0]]);
   } else {
+    console.log(temp)
     throw new Error('结构不存在' + temp[1])
   }
   return runObjItem;
@@ -145,9 +159,11 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
 function numberCalc(runStr) {
   // 第一步分词
   let resultArr = split(runStr);// '1+2'    =>   ['1', '+', '2']
+  // console.log(resultArr)
   // 第二步
   // ['1', '+', '2'] => { runType: '+', data: [{runType: 'number', data: 1},'2']}
   let runObjItem = arrayToRunObjType(resultArr, [])
+  // console.log(runObjItem)
   return runObjItem.run()
 }
 export default numberCalc;
