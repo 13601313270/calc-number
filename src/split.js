@@ -11,7 +11,7 @@ export default function (runStr) {
     } else if (['**'].includes(runStr.slice(split, split + 2))) {
       resultArr.push(runStr.slice(split, split + 2))
       split += 2;
-    } else if (['+', '-', '*', '/', '(', ')'].includes(runStr[split])) {
+    } else if (['+', '-', '*', '/', '(', ')', '%'].includes(runStr[split])) {
       resultArr.push(runStr[split]);
       split++;
     } else if (runStr[split].match(/\d/)) {

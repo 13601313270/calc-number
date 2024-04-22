@@ -32,6 +32,9 @@ class runObj {
     } else if (this.type === '**') {
       const temp = new BigNumber(this.data[0])
       return temp.pow(this.data[1]).toNumber()
+    } else if (this.type === '%') {
+      const temp = new BigNumber(this.data[0])
+      return temp.mod(this.data[1]).toNumber()
     } else if (this.type === 'number') {
       return this.data[0];
     } else if (allMethod[this.type]) {
@@ -63,6 +66,7 @@ class runObj {
 const allKeyWord = [
   Object.keys(allMethod),
   ['**'],
+  ['%'],
   ['*', '/'],
   ['+', '-'],
 ];// 以优先级排列
@@ -95,7 +99,7 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
       if (resultArr[slip] !== ')') {
         throw new Error('结构错误')
       }
-    } else if (['**', '*', '/', '+', '-'].includes(word)) {
+    } else if (['**', '*', '/', '+', '-', '%'].includes(word)) {
       if (temp[temp.length - 1].length === 1) {
         temp[temp.length - 1].push(word);
       } else {
@@ -148,7 +152,7 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
   let runObjItem;
   if (typeof temp === 'number') {
     runObjItem = new runObj('number', [temp]);
-  } else if (['+', '-', '*', '/', '**'].includes(temp[1])) {
+  } else if (['+', '-', '*', '/', '**', '%'].includes(temp[1])) {
     runObjItem = new runObj(temp[1], [temp[0], temp[2]]);
   } else if (Object.keys(allMethod).includes(temp[1])) {
     // console.log('=================')

@@ -35,7 +35,7 @@
       } else if (['**'].includes(runStr.slice(split, split + 2))) {
         resultArr.push(runStr.slice(split, split + 2));
         split += 2;
-      } else if (['+', '-', '*', '/', '(', ')'].includes(runStr[split])) {
+      } else if (['+', '-', '*', '/', '(', ')', '%'].includes(runStr[split])) {
         resultArr.push(runStr[split]);
         split++;
       } else if (runStr[split].match(/\d/)) {
@@ -88,6 +88,9 @@
       } else if (this.type === '**') {
         const temp = new BigNumber(this.data[0]);
         return temp.pow(this.data[1]).toNumber()
+      } else if (this.type === '%') {
+        const temp = new BigNumber(this.data[0]);
+        return temp.mod(this.data[1]).toNumber()
       } else if (this.type === 'number') {
         return this.data[0];
       } else if (allMethod[this.type]) {
@@ -119,6 +122,7 @@
   const allKeyWord = [
     Object.keys(allMethod),
     ['**'],
+    ['%'],
     ['*', '/'],
     ['+', '-'],
   ];// 以优先级排列
@@ -151,7 +155,7 @@
         if (resultArr[slip] !== ')') {
           throw new Error('结构错误')
         }
-      } else if (['**', '*', '/', '+', '-'].includes(word)) {
+      } else if (['**', '*', '/', '+', '-', '%'].includes(word)) {
         if (temp[temp.length - 1].length === 1) {
           temp[temp.length - 1].push(word);
         } else {
@@ -200,7 +204,7 @@
     let runObjItem;
     if (typeof temp === 'number') {
       runObjItem = new runObj('number', [temp]);
-    } else if (['+', '-', '*', '/', '**'].includes(temp[1])) {
+    } else if (['+', '-', '*', '/', '**', '%'].includes(temp[1])) {
       runObjItem = new runObj(temp[1], [temp[0], temp[2]]);
     } else if (Object.keys(allMethod).includes(temp[1])) {
       // console.log('=================')
@@ -263,6 +267,11 @@
     ['cos(1)+sin(1)', ['cos', '(', '1', ')', '+' + 'sin' + '(' + '1' + ')'], Math.cos(1) + Math.sin(1)],
     ['tan(1)', ['tan', '(', '1', ')'], Math.tan(1)],
     ['atan(1)', ['atan', '(', '1', ')'], Math.atan(1)],
+    ['37.3*100', ['37.3', '*', '100'], 3730],
+    ['6%5', ['6', '%', '5'], 1],
+    ['1+6%5', ['1', '+', '6', '%', '5'], 2],
+    ['6-6%5', ['6', '-', '6', '%', '5'], 5],
+    ['6**6%5', ['6', '**', '6', '%', '5'], 1],
   ];
 
   for (let i = 0; i < testList.length; i++) {
