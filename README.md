@@ -29,3 +29,23 @@ calcNumber('1+2*3/2+2*4');// 12
 // 支持**幂次方运算
 calcNumber('3**2')// 9
 ```
+
+运算优先级对齐js的数字计算
+
+
+# 更多扩展能力
+### 支持内置函数调用
+
+sin,cos,tan,atan,
+
+```javascript
+calcNumber('sin(1)');
+```
+
+
+### 后置处理
+#### 保留小数位 toFixed
+
+```javascript
+calcNumber('(23.123*3).toFixed(2)');
+```

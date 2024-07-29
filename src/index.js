@@ -1,5 +1,6 @@
 import split from "./split";
 import allMethod from './method/index'
+import allAfterMethod from './afterMethod/index'
 
 class runObj {
   constructor(type, data) {
@@ -39,6 +40,8 @@ class runObj {
       return this.data[0];
     } else if (allMethod[this.type]) {
       return allMethod[this.type](this.data);
+    } else if (allAfterMethod[this.type]) {
+      return allAfterMethod[this.type](this.data);
     } else {
       console.log(this.type);
       throw new Error('运算类型不存在' + this.type)
@@ -65,6 +68,7 @@ class runObj {
 
 const allKeyWord = [
   Object.keys(allMethod),
+  Object.keys(allAfterMethod),
   ['**'],
   ['%'],
   ['*', '/'],
@@ -99,6 +103,15 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
       if (resultArr[slip] !== ')') {
         throw new Error('结构错误')
       }
+    } else if (Object.keys(allAfterMethod).includes(word)) {
+      slip += 2;
+      const nextObj = arrayToRunObjType(resultArr, [')'])
+      if (temp[temp.length - 1].length === 0) {
+        temp[temp.length - 1].push(nextObj)
+        temp[temp.length - 1].push(word)
+      } else {
+        temp[temp.length - 1].push([nextObj, word])
+      }
     } else if (['**', '*', '/', '+', '-', '%'].includes(word)) {
       if (temp[temp.length - 1].length === 1) {
         temp[temp.length - 1].push(word);
@@ -126,6 +139,20 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
           temp[temp.length - 1].push(word);
         }
       }
+    } else if (word === '.') {
+      // 后置运算
+      slip += 1;
+      const allNextKeyword = [')']
+        allKeyWord.slice(2).forEach(v => {
+          v.forEach(vv => {
+            allNextKeyword.push(vv)
+          })
+        })
+      const nextObj = arrayToRunObjType(resultArr, allNextKeyword)
+      slip--;
+      const length = temp[temp.length - 1].length;
+      nextObj.data.unshift(temp[temp.length - 1][length - 1].run())
+      temp[temp.length - 1][length - 1] = nextObj;
     } else {
       throw new Error('分词失败' + word)
     }
@@ -139,14 +166,8 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
       temp[temp.length - 1] = temp[temp.length - 1][0]
     }
   }
-  // console.log('=================temp==============')
-  // console.log(JSON.stringify(temp))
   if (temp.length === 1) {
     temp = temp[0]
-  }
-  if (typeof temp !== 'number') {
-    // console.log('=================')
-    // console.log(temp)
   }
 
   let runObjItem;
@@ -155,9 +176,11 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
   } else if (['+', '-', '*', '/', '**', '%'].includes(temp[1])) {
     runObjItem = new runObj(temp[1], [temp[0], temp[2]]);
   } else if (Object.keys(allMethod).includes(temp[1])) {
-    // console.log('=================')
-    // console.log(temp)
     runObjItem = new runObj(temp[1], [temp[0]]);
+  } else if (Object.keys(allAfterMethod).includes(temp[1])) {
+    runObjItem = new runObj(temp[1], [temp[0]]);
+  } else if (temp instanceof runObj) {
+    return temp;
   } else {
     console.log(temp)
     throw new Error('结构不存在' + temp[1])
