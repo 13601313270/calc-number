@@ -45,7 +45,12 @@
       } else if (runStr[split].match(/\d/)) {
         let numberStr = runStr[split];
         for (let i = split + 1; i < runStr.length; i++) {
-          if (runStr[i].match(/\d/) || runStr[i] === '.') {
+          const kxMatch = runStr.slice(i).match(/^e-\d+/);// 科学计数法
+          if (kxMatch) {
+            numberStr += kxMatch[0];
+            split += kxMatch[0].length;
+          }
+          else if (runStr[i].match(/\d/) || runStr[i] === '.') {
             numberStr += runStr[i];
             split++;
           } else {
@@ -330,6 +335,9 @@
     ['(42).toFixed(2)+(42).toFixed(2)', ['(', '42', ')', '.', 'toFixed', '(', '2', ')', '+', '(', '42', ')', '.', 'toFixed', '(', '2', ')'], 84],
     ['(42).toFixed(2)+3*2', ['(', '42', ')', '.', 'toFixed', '(', '2', ')', '+', '3', '*', '2'], 48],
     ['2**2 + (42).toFixed(2)+3*2', ['2', '**', '2', '+', '(', '42', ')', '.', 'toFixed', '(', '2', ')', '+', '3', '*', '2'], 52],
+    ['8.000000000000001e-7', ['8.000000000000001e-7'], 8.000000000000001e-7],
+    ['8e-10 * 1000000', ['8e-10', '*', '1000000'], 0.0008],
+    ['397 * 8.000000000000001e-7 + 801 * 0.000002 + 0.0007188', ['397', '*', '8.000000000000001e-7', '+', '801', '*', '0.000002', '+', '0.0007188'], 0.0026384],
   ];
 
   const tempJoinWord = '|||||';
@@ -337,7 +345,7 @@
     const splitWord = split(testList[i][0]);
     if (splitWord.join(tempJoinWord) !== testList[i][1].join(tempJoinWord)) {
       console.log(testList[i][0]);
-      console.log(splitWord.join('  '));
+      console.log(splitWord.join('      '));
       console.log(testList[i][1].join('  '));
       throw new Error('分词错误')
     }
@@ -351,4 +359,4 @@
     }
   }
 
-})();
+}());

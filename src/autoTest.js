@@ -58,6 +58,9 @@ const testList = [
   ['(42).toFixed(2)+(42).toFixed(2)', ['(', '42', ')', '.', 'toFixed', '(', '2', ')', '+', '(', '42', ')', '.', 'toFixed', '(', '2', ')'], 84],
   ['(42).toFixed(2)+3*2', ['(', '42', ')', '.', 'toFixed', '(', '2', ')', '+', '3', '*', '2'], 48],
   ['2**2 + (42).toFixed(2)+3*2', ['2', '**', '2', '+', '(', '42', ')', '.', 'toFixed', '(', '2', ')', '+', '3', '*', '2'], 52],
+  ['8.000000000000001e-7', ['8.000000000000001e-7'], 8.000000000000001e-7],
+  ['8e-10 * 1000000', ['8e-10', '*', '1000000'], 0.0008],
+  ['397 * 8.000000000000001e-7 + 801 * 0.000002 + 0.0007188', ['397', '*', '8.000000000000001e-7', '+', '801', '*', '0.000002', '+', '0.0007188'], 0.0026384],
 ]
 
 const tempJoinWord = '|||||';
@@ -65,7 +68,7 @@ for (let i = 0; i < testList.length; i++) {
   const splitWord = split(testList[i][0]);
   if (splitWord.join(tempJoinWord) !== testList[i][1].join(tempJoinWord)) {
     console.log(testList[i][0])
-    console.log(splitWord.join('  '))
+    console.log(splitWord.join('      '))
     console.log(testList[i][1].join('  '))
     throw new Error('分词错误')
   }
