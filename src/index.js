@@ -120,6 +120,11 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
         const thisIndex = allKeyWord.findIndex(v => v.includes(word));
         const preIndex = allKeyWord.findIndex(v => v.includes(preview[1]))
         const allNextKeyword = []
+        if (endKeyWord.length) {
+          endKeyWord.forEach(v => {
+            allNextKeyword.push(v);
+          })
+        }
         allKeyWord.slice(thisIndex + 1).forEach(v => {
           v.forEach(vv => {
             allNextKeyword.push(vv)
@@ -143,11 +148,11 @@ function arrayToRunObjType(resultArr, endKeyWord = []) {
       // 后置运算
       slip += 1;
       const allNextKeyword = [')']
-        allKeyWord.slice(2).forEach(v => {
-          v.forEach(vv => {
-            allNextKeyword.push(vv)
-          })
+      allKeyWord.slice(2).forEach(v => {
+        v.forEach(vv => {
+          allNextKeyword.push(vv)
         })
+      })
       const nextObj = arrayToRunObjType(resultArr, allNextKeyword)
       slip--;
       const length = temp[temp.length - 1].length;

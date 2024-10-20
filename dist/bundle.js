@@ -198,6 +198,11 @@
           const thisIndex = allKeyWord.findIndex(v => v.includes(word));
           const preIndex = allKeyWord.findIndex(v => v.includes(preview[1]));
           const allNextKeyword = [];
+          if (endKeyWord.length) {
+            endKeyWord.forEach(v => {
+              allNextKeyword.push(v);
+            });
+          }
           allKeyWord.slice(thisIndex + 1).forEach(v => {
             v.forEach(vv => {
               allNextKeyword.push(vv);
@@ -221,11 +226,11 @@
         // 后置运算
         slip += 1;
         const allNextKeyword = [')'];
-          allKeyWord.slice(2).forEach(v => {
-            v.forEach(vv => {
-              allNextKeyword.push(vv);
-            });
+        allKeyWord.slice(2).forEach(v => {
+          v.forEach(vv => {
+            allNextKeyword.push(vv);
           });
+        });
         const nextObj = arrayToRunObjType(resultArr, allNextKeyword);
         slip--;
         const length = temp[temp.length - 1].length;
@@ -303,6 +308,10 @@
     ['1+(12+22)+1*2', ['1', '+', '(', '12', '+', '22', ')', '+', '1', '*', '2'], 37],
     ['1+(12+22)*2+1', ['1', '+', '(', '12', '+', '22', ')', '*', '2', '+', '1'], 70],
     ['1+(12+22)*2+(1+1)', ['1', '+', '(', '12', '+', '22', ')', '*', '2', '+', '(', '1', '+', '1', ')'], 71],
+    ['(19*0.02+39)', ['(', '19', '*', '0.02', '+', '39', ')'], 39.38],
+    ['(19*0.02+39*1+0)', ['(', '19', '*', '0.02', '+', '39', '*', '1', '+', '0', ')'], 39.38],
+    ['(19*0.02+39*1)', ['(', '19', '*', '0.02', '+', '39', '*', '1', ')'], 39.38],
+    ['(19*0.02+39*0.06)/1000', ['(', '19', '*', '0.02', '+', '39', '*', '0.06', ')', '/', '1000'], 0.00272],
     ['3**2', ['3', '**', '2'], 9],
     ['2**3**2', ['2', '**', '3', '**', '2'], 512],
     ['8/2/2', ['8', '/', '2', '/', '2'], 2],
@@ -346,7 +355,7 @@
     if (splitWord.join(tempJoinWord) !== testList[i][1].join(tempJoinWord)) {
       console.log(testList[i][0]);
       console.log(splitWord.join('      '));
-      console.log(testList[i][1].join('  '));
+      console.log(testList[i][1].join('      '));
       throw new Error('分词错误')
     }
 
