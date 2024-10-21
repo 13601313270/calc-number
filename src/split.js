@@ -14,7 +14,7 @@ export default function (runStr) {
     } else if (runStr[split].match(/\d/)) {
       let numberStr = runStr[split];
       for (let i = split + 1; i < runStr.length; i++) {
-        const kxMatch = runStr.slice(i).match(/^e-\d+/)// 科学计数法
+        const kxMatch = runStr.slice(i).match(/^e(\+|-)\d+/)// 科学计数法
         if (kxMatch) {
           numberStr += kxMatch[0];
           split += kxMatch[0].length;

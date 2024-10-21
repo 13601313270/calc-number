@@ -45,7 +45,7 @@
       } else if (runStr[split].match(/\d/)) {
         let numberStr = runStr[split];
         for (let i = split + 1; i < runStr.length; i++) {
-          const kxMatch = runStr.slice(i).match(/^e-\d+/);// 科学计数法
+          const kxMatch = runStr.slice(i).match(/^e(\+|-)\d+/);// 科学计数法
           if (kxMatch) {
             numberStr += kxMatch[0];
             split += kxMatch[0].length;
@@ -284,6 +284,7 @@
   }
 
   const testList = [
+    ['9e+22 / 9e+20', ['9e+22', '/', '9e+20'], 100],
     ['1+2*3/4+5*6', ['1', '+', '2', '*', '3', '/', '4', '+', '5', '*', '6'], 32.5],
     ['1+2*3+2*4', ['1', '+', '2', '*', '3', '+', '2', '*', '4'], 15],
     ['1+2*3+2', ['1', '+', '2', '*', '3', '+', '2'], 9],
