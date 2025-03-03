@@ -39,10 +39,7 @@
       if (['**'].includes(runStr.slice(split, split + 2))) {
         resultArr.push(runStr.slice(split, split + 2));
         split += 2;
-      } else if (['+', '-', '*', '/', '(', ')', '%'].includes(runStr[split])) {
-        resultArr.push(runStr[split]);
-        split++;
-      } else if (runStr[split].match(/\d/)) {
+      } else if ((runStr[split].match(/-/) && resultArr.length === 0 && runStr[split + 1] && runStr[split + 1].match(/\d/)) || runStr[split].match(/\d/)) {
         let numberStr = runStr[split];
         for (let i = split + 1; i < runStr.length; i++) {
           const kxMatch = runStr.slice(i).match(/^e(\+|-)\d+/);// 科学计数法
@@ -58,6 +55,9 @@
           }
         }
         resultArr.push(numberStr);
+        split++;
+      } else if (['+', '-', '*', '/', '(', ')', '%'].includes(runStr[split])) {
+        resultArr.push(runStr[split]);
         split++;
       } else if (runStr[split] === '.') {
         // 后置运算例如(23.412).toFixed(2)
@@ -289,6 +289,7 @@
     ['1+2*3+2*4', ['1', '+', '2', '*', '3', '+', '2', '*', '4'], 15],
     ['1+2*3+2', ['1', '+', '2', '*', '3', '+', '2'], 9],
     ['1+2*3', ['1', '+', '2', '*', '3'], 7],
+    ['-6.99*100', ['-6.99', '*', '100'], -699],
     ['2*(3+4)', ['2', '*', '(', '3', '+', '4', ')'], 14],
     ['2*3', ['2', '*', '3'], 6],
     ['1+3', ['1', '+', '3'], 4],
@@ -369,4 +370,4 @@
     }
   }
 
-}());
+})();

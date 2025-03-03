@@ -1,6 +1,6 @@
 {
   "name": "calc-number",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -12,7 +12,6 @@
     "bignumber.js": "^9.1.2"
   },
   "types": "./src/index.d.ts",
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/13601313270/calc-number.git"

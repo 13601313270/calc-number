@@ -8,10 +8,7 @@ export default function (runStr) {
     if (['**'].includes(runStr.slice(split, split + 2))) {
       resultArr.push(runStr.slice(split, split + 2))
       split += 2;
-    } else if (['+', '-', '*', '/', '(', ')', '%'].includes(runStr[split])) {
-      resultArr.push(runStr[split]);
-      split++;
-    } else if (runStr[split].match(/\d/)) {
+    } else if ((runStr[split].match(/-/) && resultArr.length === 0 && runStr[split + 1] && runStr[split + 1].match(/\d/)) || runStr[split].match(/\d/)) {
       let numberStr = runStr[split];
       for (let i = split + 1; i < runStr.length; i++) {
         const kxMatch = runStr.slice(i).match(/^e(\+|-)\d+/)// 科学计数法
@@ -27,6 +24,9 @@ export default function (runStr) {
         }
       }
       resultArr.push(numberStr)
+      split++;
+    } else if (['+', '-', '*', '/', '(', ')', '%'].includes(runStr[split])) {
+      resultArr.push(runStr[split]);
       split++;
     } else if (runStr[split] === '.') {
       // 后置运算例如(23.412).toFixed(2)
